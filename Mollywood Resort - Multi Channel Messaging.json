@@ -1,0 +1,1442 @@
+{
+  "name": "Mollywood Resort - Multi Channel Messaging",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const body = $json.body ?? $json;\n\n// Auto detect channel if not explicitly provided\nlet source = body.channel ?? $json.channel;\n\nif (!source) {\n  if (body.object === 'page' || body.entry?.[0]?.messaging) {\n    source = 'facebook_messenger';\n  } else if (body.data?.senderData || body.instanceId) {\n    source = 'whatsapp';\n  } else if (body.message?.chat) {\n    source = 'telegram';\n  } else {\n    source = 'unknown';\n  }\n}\n\nlet userId = '';\nlet message = '';\nlet customerName = '';\nlet customerPhone = '';\nlet customerEmail = '';\nlet conversationId = '';\n\nif (source === 'facebook_messenger') {\n  const event = body.entry?.[0]?.messaging?.[0] ?? body;\n  userId = String(event.sender?.id ?? body.user_id ?? '');\n  message = String(event.message?.text ?? body.message ?? body.text ?? '');\n  customerName = String(body.customer_name ?? '');\n  conversationId = String(event.sender?.id ?? body.conversation_id ?? '');\n} else if (source === 'whatsapp') {\n  const data = body.data ?? body;\n  userId = String(data.senderData?.chatId ?? data.senderData?.sender ?? body.user_id ?? '');\n  message = String(data.messageData?.textMessageData?.textMessage ?? data.message ?? body.text ?? '');\n  customerName = String(data.senderData?.senderName ?? body.customer_name ?? '');\n  customerPhone = String(data.senderData?.sender ?? body.phone ?? '');\n  conversationId = userId;\n} else if (source === 'telegram') {\n  const tg = body.message ?? body;\n  userId = String(tg.from?.id ?? body.user_id ?? '');\n  message = String(tg.text ?? body.text ?? body.message ?? '');\n  customerName = String(tg.from?.first_name ?? body.customer_name ?? '');\n  conversationId = String(tg.chat?.id ?? body.conversation_id ?? userId);\n}\n\nreturn {\n  json: {\n    channel: source,\n    user_id: userId,\n    conversation_id: conversationId,\n    message: message,\n    customer_name: customerName,\n    customer_phone: customerPhone,\n    customer_email: customerEmail,\n    received_at: new Date().toISOString()\n  }\n};"
+      },
+      "id": "eda90894-ffe1-47cb-962c-f9639222103e",
+      "name": "Normalize Incoming Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Rooms"
+        },
+        "options": {}
+      },
+      "id": "d5a3dd18-c9f0-4a86-8530-7d48a6c13f7c",
+      "name": "Read Rooms Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        48
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Restaurants",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "d1e7b533-e862-4952-a90c-b432ccde9064",
+      "name": "Read Restaurant Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1296818538,
+          "mode": "list",
+          "cachedResultName": "Events",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=1296818538"
+        },
+        "options": {}
+      },
+      "id": "7fb6012c-e8cf-4fdb-986c-fb600e2330f4",
+      "name": "Read Event Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        688
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 199051218,
+          "mode": "list",
+          "cachedResultName": "FAQ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=199051218"
+        },
+        "options": {}
+      },
+      "id": "917b6376-105c-44cc-b8fc-ec08fa396b95",
+      "name": "Read FAQ Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        1008
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "b4176998-4f2d-44e6-a21a-a5dc8277307e",
+      "name": "Merge Rooms Restaurant",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        544,
+        208
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ead82fc1-0e51-41da-8216-f7082cffbc92",
+      "name": "Merge Event FAQ",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        544,
+        848
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "682fe82f-0756-42db-b6b2-1e01ee278e64",
+      "name": "Merge All Resort Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        816,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Merge All Resort Data theke shob item read kora\nconst itemsData = $input.all().map(item => item.json);\n\nlet channel = 'unknown';\nlet user_id = '';\nlet conversation_id = '';\nlet message = '';\nlet customer_name = '';\n\n// 1. Telegram Check\ntry {\n  const telegramData = $('Telegram Trigger').first()?.json;\n  if (telegramData?.message?.text) {\n    channel = 'telegram';\n    user_id = String(telegramData.message.from?.id || '');\n    conversation_id = String(telegramData.message.chat?.id || '');\n    message = telegramData.message.text || '';\n    customer_name = telegramData.message.from?.first_name || 'Telegram User';\n  }\n} catch (e) {}\n\n// 2. WhatsApp (GREENAPI Trigger) Check\ntry {\n  const waData = $('GREENAPI Trigger').first()?.json;\n  if (waData) {\n    const body = waData.body || waData;\n    const textMsg = body.messageData?.textMessageData?.textMessage || body.messageData?.extendedTextMessageData?.text || '';\n    if (textMsg) {\n      channel = 'whatsapp';\n      user_id = String(body.senderData?.chatId || body.chatData?.chatId || '');\n      conversation_id = user_id;\n      message = textMsg;\n      customer_name = body.senderData?.senderName || 'WhatsApp User';\n    }\n  }\n} catch (e) {}\n\n// 3. Facebook Messenger (Webhook) Check\ntry {\n  const fbData = $('Webhook').first()?.json;\n  if (fbData) {\n    const entry = fbData.body?.entry?.[0] || fbData.entry?.[0];\n    const messaging = entry?.messaging?.[0];\n    if (messaging?.message?.text) {\n      channel = 'facebook';\n      user_id = String(messaging.sender?.id || '');\n      conversation_id = user_id;\n      message = messaging.message.text || '';\n      customer_name = 'Facebook User';\n    }\n  }\n} catch (e) {}\n\n// AI Agent-er jonno Output pathano\nreturn [{\n  json: {\n    channel,\n    user_id,\n    conversation_id,\n    message,\n    customer_name,\n    resort_data: JSON.stringify(itemsData, null, 2)\n  }\n}];"
+      },
+      "id": "708746a1-5c18-4687-891d-b9f3236a511c",
+      "name": "Build Resort AI Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. AI Output Parse\nlet result = {};\ntry {\n  const rawOutput = $json.output || $input.first()?.json?.output || '{}';\n  result = typeof rawOutput === 'string' ? JSON.parse(rawOutput) : rawOutput;\n} catch (e) {\n  result = {};\n}\n\nconst detectedChannel = $('Build Resort AI Context').first()?.json?.channel || 'facebook';\nconst reply = result.customer_reply || result.reply_text || \"ধন্যবাদ! আমরা আপনার অনুরোধটি রিসিভ করেছি।\";\n\n// 2. Auto Generate Receipt ID\nconst randomNum = Math.floor(10000 + Math.random() * 90000);\nconst receiptId = \"REC-\" + randomNum;\n\n// 3. Smart Extraction for Nested AI Data\nconst extData = result.extracted_data || result.details || {};\nconst innerDetails = extData.details || extData || {};\n\n// Extract Food Items\nlet itemsList = innerDetails.items_ordered || extData.items_ordered || result.items_ordered || result.items;\nconst items = Array.isArray(itemsList) \n  ? itemsList.join(', ') \n  : (itemsList || 'N/A');\n\n// Extract Price\nconst amount = innerDetails.total_price || extData.total_price || result.total_price || result.amount || 'N/A';\n\n// Extract Customer Info\nconst customerName = extData.customer_name || innerDetails.customer_name || result.customer_name || 'N/A';\nconst customerPhone = extData.customer_phone || innerDetails.customer_phone || result.customer_phone || 'N/A';\nconst customerEmail = extData.customer_email || innerDetails.customer_email || result.customer_email || 'N/A';\nconst orderDate = innerDetails.date_time || innerDetails.check_in_date || extData.date_time || extData.check_in_date || new Date().toLocaleString();\n\n// 4. Output with Dual Mapping (for Sheets & Telegram)\nreturn [{\n  json: {\n    // Sheet Keys\n    \"Receipt ID\": receiptId,\n    \"Customer Phone\": customerPhone,\n    \"Customer Email\": customerEmail,\n    \"Customer Name\": customerName,\n    \"Items\": items,\n    \"Amount\": amount,\n    \"Date\": orderDate,\n    \"Timestamp\": new Date().toLocaleString(),\n    \"source_channel\": detectedChannel,\n    \n    // Telegram Standard Keys (N/A এরর ঠেকানোর জন্য)\n    \"receipt_id\": receiptId,\n    \"customer_name\": customerName,\n    \"customer_phone\": customerPhone,\n    \"customer_email\": customerEmail,\n    \"items\": items,\n    \"amount\": amount,\n    \"order_date\": orderDate,\n    \n    // Internal Variables\n    \"intent\": result.intent || \"order\",\n    \"customer_reply\": reply,\n    \"message\": reply,\n    \"details\": extData\n  }\n}];"
+      },
+      "id": "4a5bb28a-f7a8-4b2d-9ea0-367c7825c333",
+      "name": "Parse AI JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "inquiry",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Inquiry"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "order",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "booking",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Booking"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2e71943-b6ac-41b9-8080-3258f4339705",
+      "name": "Route Intent",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2032,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 608011264,
+          "mode": "list",
+          "cachedResultName": "Inquery",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=608011264"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer Phone",
+              "displayName": "Customer Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Input",
+              "displayName": "Customer Input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI Response",
+              "displayName": "AI Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Inquiry Type",
+              "displayName": "Inquiry Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "intent",
+              "displayName": "intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source_channel",
+              "displayName": "source_channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_reply",
+              "displayName": "customer_reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "extracted_data",
+              "displayName": "extracted_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reply_text",
+              "displayName": "reply_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "afd2a09a-bd9b-48d0-800c-2d07baf9b51f",
+      "name": "Append Inquiry",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2560,
+        736
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 553574685,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=553574685"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Receipt ID": "={{ $json['Receipt ID'] }}",
+            "Customer Phone": "={{ $json['Customer Phone'] }}",
+            "Customer Email": "={{ $json['Customer Email'] }}",
+            "Customer Name": "={{ $json['Customer Name'] }}",
+            "Amount": "={{ $json.Amount }}",
+            "Items": "={{ $json.Items }}",
+            "Date": "={{ $json.Date }}",
+            "Timestamp": "={{ $json.Timestamp }}",
+            "source_channel": "={{ $json.source_channel }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Receipt ID",
+              "displayName": "Receipt ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Phone",
+              "displayName": "Customer Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Items",
+              "displayName": "Items",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source_channel",
+              "displayName": "source_channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "6b4832d7-8db1-430f-8bd7-14611e88e76f",
+      "name": "Append Order - Payment Pending",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2448,
+        960
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1691133835,
+          "mode": "list",
+          "cachedResultName": "Booking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=1691133835"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Booking ID",
+              "displayName": "Booking ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Phone",
+              "displayName": "Customer Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Type",
+              "displayName": "Booking Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Item Name",
+              "displayName": "Item Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Check-in Date",
+              "displayName": "Check-in Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Check-out Date",
+              "displayName": "Check-out Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Status",
+              "displayName": "Booking Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created Timestamp",
+              "displayName": "Created Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f5139439-b921-44ff-973a-0e513bdd8cbd",
+      "name": "Append Booking - Payment Pending",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2464,
+        1232
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// 1. Input data read\nconst data = $json;\n\n// 2. Extract Fields safely\nconst receiptId = data[\"Receipt ID\"] || data.receipt_id || 'N/A';\nconst name = data[\"Customer Name\"] || data.customer_name || data.extracted_data?.customer_name || 'N/A';\nconst phone = data[\"Customer Phone\"] || data.customer_phone || data.extracted_data?.customer_phone || 'N/A';\nconst email = data[\"Customer Email\"] || data.customer_email || data.extracted_data?.customer_email || 'N/A';\nconst items = data[\"Items\"] || data.items || 'N/A';\nconst amount = data[\"Amount\"] || data.amount || 'N/A';\nconst dateStr = data[\"Date\"] || data.order_date || 'N/A';\nconst channel = data[\"source_channel\"] || data.source_channel || 'facebook';\nconst intent = data.intent || 'order';\n\n// 3. Construct Clean Telegram Notification Text\nlet text = \"\";\n\nif (intent === 'booking') {\n  text = `🚨 NEW BOOKING ALERT - MOLLYWOOD RESORT 🚨\\n\\n` +\n         `🧾 Receipt ID: ${receiptId}\\n` +\n         `👤 Customer Name: ${name}\\n` +\n         `📞 Phone: ${phone}\\n` +\n         `✉️ Email: ${email}\\n` +\n         `🏠 Cottage/Room: ${items}\\n` +\n         `📅 Dates: ${dateStr}\\n` +\n         `📱 Channel: ${channel}\\n\\n` +\n         `Please check Google Sheets for details!`;\n} else {\n  text = `🚨 NEW ORDER ALERT - MOLLYWOOD RESORT 🚨\\n\\n` +\n         `🧾 Receipt ID: ${receiptId}\\n` +\n         `👤 Customer Name: ${name}\\n` +\n         `📞 Phone: ${phone}\\n` +\n         `✉️ Email: ${email}\\n\\n` +\n         `🍲 Items: ${items}\\n` +\n         `💰 Total Amount: ৳${amount}\\n` +\n         `📅 Serving Date & Time: ${dateStr}\\n` +\n         `📱 Channel: ${channel}\\n\\n` +\n         `Please process the order immediately!`;\n}\n\n// 4. Return Object (Matching 'Run Once for Each Item' mode)\nreturn {\n  message: text,\n  chat_id: data.chat_id || \"\"\n};"
+      },
+      "id": "bdc6536c-7be3-4490-82e7-e5b29d6a6e8c",
+      "name": "Prepare Owner Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const parseNode = $('Parse AI JSON')?.first()?.json || {};\nconst contextNode = $('Build Resort AI Context')?.first()?.json || {};\n\nconst channel = (parseNode.source_channel || parseNode.channel || contextNode.channel || 'whatsapp').toLowerCase();\n\nlet chatId = parseNode.user_id || parseNode.chat_id || contextNode.user_id || contextNode.conversation_id || '';\n\n// If WhatsApp, ensure strictly standard phone@c.us format\nif (channel === 'whatsapp' && chatId) {\n  const cleanNum = chatId.replace(/[^0-9]/g, '');\n  chatId = `${cleanNum}@c.us`;\n}\n\nconst replyMsg = parseNode.customer_reply || parseNode.reply_text || parseNode.output || parseNode.text || 'Hello! Welcome to Mollywood Resort.';\n\nreturn [{\n  json: {\n    channel: channel,\n    user_id: String(chatId),\n    conversation_id: String(chatId),\n    reply_text: replyMsg\n  }\n}];"
+      },
+      "id": "c4b8f4f7-d680-43c9-9531-3a4d60931434",
+      "name": "Prepare Channel Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "telegram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5c586f10-8321-4c13-a43f-adf489994895"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Telegram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "whatsapp",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ce639c67-d032-4c5c-832b-bf23bb1448ac"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "WhatsApp"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "facebook",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "29f1d621-b9d6-4df3-8fd0-eca42728b2d4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Facebook"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5445ce67-05cb-44b6-a225-48902927faac",
+      "name": "Route Reply To Source Channel",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2208,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=={{ $('Build Resort AI Context').first().json.conversation_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        1408,
+        1136
+      ],
+      "id": "e6de5819-e473-48a6-b94b-b45e5e535aa3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "cityName": "Rangpur, BD",
+        "language": "en"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        1184
+      ],
+      "id": "4bde6c95-e77e-490a-a4f6-36f21bc718a2",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "1z04AQIfs2qo8BRw",
+          "name": "OpenWeatherMap account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        1216
+      ],
+      "id": "afe8e132-8ae3-49fe-9533-294064ed81af",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -464,
+        352
+      ],
+      "id": "53bb80e9-eecf-4d4c-97ca-af990acdcdb2",
+      "name": "Telegram Trigger",
+      "webhookId": "c3893dec-87e6-4de6-be6f-a72cd5aa1c61",
+      "credentials": {
+        "telegramApi": {
+          "id": "YZ3LV8i768Lq0LGF",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.user_id }}",
+        "text": "={{ $json.reply_text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2576,
+        16
+      ],
+      "id": "1d12a1a6-9465-4991-8a79-107c9ec16771",
+      "name": "Send a text message",
+      "webhookId": "f6aa7019-89f5-4c46-9482-ac83bd529a39",
+      "credentials": {
+        "telegramApi": {
+          "id": "YZ3LV8i768Lq0LGF",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Customer Message: {{ $json.message }}\n\nResort Data:\n{{ $json.resort_data }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=CURRENT TODAY DATE & TIME: {{ $now.format('YYYY-MM-DD HH:mm') }}\n\nYou are the official AI Receptionist for Mollywood Resort.\n\nYou handle customer conversations across WhatsApp, Telegram, Facebook Messenger, and Instagram DM.\n\nYour primary responsibility is to understand the customer naturally, provide accurate resort information, answer questions professionally, collect the required information for orders and bookings, and guide the customer smoothly through the conversation.\n\nLANGUAGE & COMMUNICATION RULES\n\n1. Understand the customer regardless of the language or writing style they use.\n\nYou must understand:\n- Bangla\n- English\n- Banglish (Bangla written using English/Roman characters)\n- Mixed Bangla + English\n- Informal or conversational language\n- Spelling mistakes, abbreviations, short forms and common chat language\n\nExamples:\n- \"room price koto?\"\n- \"রুমের ভাড়া কত?\"\n- \"How much is a room?\"\n- \"room rent plz?\"\n- \"apnader cottage available ase?\"\n- \"আপনাদের কটেজ available আছে?\"\n- \"Can I book a cottage for 2 nights?\"\n\nAll of these should be understood correctly based on the conversation context.\n\n2. Reply in the language and style that best matches the customer's message.\n\nIf the customer writes in Bangla, reply naturally in Bangla.\nIf the customer writes in English, reply naturally in English.\nIf the customer writes in Banglish, reply naturally in Banglish.\nIf the customer mixes Bangla and English, you may naturally mix Bangla and English as well.\n\nDo NOT unnecessarily translate the customer's language into another language.\nDo NOT force formal language when the customer is speaking casually.\n\nThe reply should feel like a real, professional human receptionist communicating naturally with the customer.\n\n3. Never mention that you are an AI unless the customer explicitly asks.\nMaintain a professional, friendly, helpful and welcoming receptionist tone.\nKeep responses clear and reasonably concise. Do not send unnecessarily long messages.\n\nRESORT INFORMATION RULES\n\nUse ONLY the information provided in the supplied `resort_data`.\n\nNever invent or assume:\n- Prices\n- Room availability\n- Restaurant items or prices\n- Event packages\n- Facilities\n- Policies\n- Booking status\n- Order status\n- Payment status\n- Discounts\n- Offers\n- Dates or availability\n\nIf the required information is not available in `resort_data`, politely tell the customer that the information is not currently available and ask for the next appropriate step. Never guess.\n\nCONVERSATION & INTENT RULES\n\nClassify the customer conversation as exactly ONE of:\n- inquiry\n- order\n- booking\n\nSOURCE CHANNEL RULE:\nExtract the channel value (e.g., `facebook`, `telegram`, `whatsapp`) from the incoming payload/context and set it as `source_channel`. Never use `unknown` if the channel name is provided in the input context.\n\nGENERAL QUESTIONS (INQUIRY)\n\nFor general questions, information requests, availability questions, price questions, facility questions, restaurant questions, event questions, or any conversation that is not yet a confirmed order or booking:\nUse:\n\"intent\": \"inquiry\"\n\nFOOD ORDERS (ORDER)\n\nDo NOT set \"intent\": \"order\" until ALL of the following mandatory details have been collected:\n1. customer_name\n2. customer_phone\n3. customer_email\n4. items_ordered (items with quantities)\n5. total_price\n6. date_time (exact serving/dining date & time standardized as YYYY-MM-DD hh:mm AM/PM)\n7. Explicit customer confirmation (e.g., \"Yes, confirm the order\", \"ঠিক আছে, confirm করুন\")\n\nSTRICT RULE FOR FOOD ORDERS:\n- Since this is a resort restaurant, you MUST ask for the exact dining/serving date & time (`date_time`).\n- If ANY required detail (including date_time) is missing OR explicit confirmation has NOT been received, set \"intent\": \"inquiry\" and politely ask for the missing details.\n\nROOM / EVENT BOOKINGS (BOOKING)\n\nDo NOT set \"intent\": \"booking\" until ALL of the following mandatory details have been collected:\n1. customer_name\n2. customer_phone\n3. customer_email\n4. cottage_or_event_type (specific room/cottage or event hall selected)\n5. check_in_date (strictly YYYY-MM-DD format)\n6. check_out_date (strictly YYYY-MM-DD format)\n7. guest_count\n8. Explicit customer confirmation (e.g., \"Yes, confirm the booking\", \"ঠিক আছে, বুকিং কনফার্ম করুন\")\n\nSTRICT RULE FOR ROOM BOOKINGS:\n- If ANY required detail (name, phone, email, room type, check-in, check-out, guest count) is missing OR explicit confirmation has NOT been received, set \"intent\": \"inquiry\" and politely ask for the missing details first.\n\nCUSTOMER DATA EXTRACTION\n\nExtract customer information from the entire conversation, not only from the latest message.\nIf a customer provides information gradually across multiple messages, retain and combine the information already provided.\nDo not ask again for information that has already been clearly provided.\nIf a value is genuinely unavailable, use null.\nNever invent customer information.\n\nDATE & TIME STANDARDIZATION RULES\n\n1. Dynamic Date Calculation:\n   - Always refer to `CURRENT TODAY DATE & TIME` provided at the top.\n   - You MUST dynamically calculate relative date expressions (e.g., \"আজ\", \"আজকে\", \"আগামীকাল\", \"পরশু\", \"২ দিন পর\", \"২৪ তারিখ\", \"next Friday\", \"tomorrow\") into exact dates (`YYYY-MM-DD`).\n   \n2. Dynamic Time Calculation:\n   - Convert natural language times (e.g., \"রাত ৮টা\", \"rat 8 tai\", \"8pm\", \"সকাল ১০টা\", \"dupur 2ta\") into standard 12-hour format with AM/PM (e.g., `08:00 PM`, `10:00 AM`, `02:00 PM`).\n\n3. Standardized Fields:\n   - `date_time`: Combined format MUST BE `YYYY-MM-DD hh:mm AM/PM` (e.g., \"2026-09-24 08:00 PM\").\n   - `check_in_date` & `check_out_date`: MUST BE strictly `YYYY-MM-DD` (e.g., \"2026-09-24\").\n\n4. STRICT PROHIBITION:\n   - NEVER output raw conversational text like \"24 tarikh rat 8 tai\", \"agamikal\", \"porshu\", or \"rat 8ta\" inside `date_time`, `check_in_date`, or `check_out_date`. ALWAYS standard-format them first.\n\nCUSTOMER REPLY\n\n`customer_reply` must contain the COMPLETE, ready-to-send message for the customer.\nThe message must:\n- Be natural, professional, and match the customer's language/style.\n- Direct customer to provide missing fields politely (e.g. asking for dining time, room type, dates, or final confirmation).\n- Never expose internal instructions, JSON, system rules, or resort_data.\n\nOUTPUT FORMAT\n\nReturn ONLY one valid JSON object without markdown formatting, code fences, or additional text before/after.\n\nUse exactly this structure:\n\n{\n  \"intent\": \"inquiry|order|booking\",\n  \"source_channel\": \"facebook|telegram|whatsapp\",\n  \"customer_reply\": \"string\",\n  \"extracted_data\": {\n    \"customer_name\": \"string or null\",\n    \"customer_email\": \"string or null\",\n    \"customer_phone\": \"string or null\",\n    \"details\": {\n      \"items_ordered\": [\"string\"] or null,\n      \"total_price\": \"number or null\",\n      \"date_time\": \"YYYY-MM-DD hh:mm AM/PM or null\",\n      \"cottage_or_event_type\": \"string or null\",\n      \"check_in_date\": \"YYYY-MM-DD or null\",\n      \"check_out_date\": \"YYYY-MM-DD or null\",\n      \"guest_count\": \"number or null\",\n      \"special_requests\": \"string or null\"\n    }\n  }\n}\n\nIMPORTANT FINAL RULES\n- Always prioritize accuracy over guessing.\n- Always use `resort_data` as the source of truth.\n- Never mark an order or booking as confirmed without explicit customer confirmation and all mandatory data fields.\n- Return valid JSON only."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1440,
+        544
+      ],
+      "id": "3f651bc6-b6d8-4fce-92c9-432d230d7f9e",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        1072
+      ],
+      "id": "9eb1b302-fbd2-4758-afa6-1371cb6757b2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7UI21HI4wQpQGTzR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "webhookType": [
+          "incomingMessageReceived"
+        ]
+      },
+      "type": "@green-api/n8n-nodes-whatsapp-greenapi.greenapiTrigger",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        672
+      ],
+      "id": "26407604-7ecf-4d30-b5b7-e1a0800c2781",
+      "name": "GREENAPI Trigger",
+      "webhookId": "535b6342-ece8-4236-912e-537eab2cde17",
+      "credentials": {
+        "greenApiAuthApi": {
+          "id": "IEFNNbCkKVhfThoh",
+          "name": "Green-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.conversation_id }}",
+        "quotedMessageId": "=",
+        "message": "={{ $json.reply_text }}"
+      },
+      "type": "@green-api/n8n-nodes-whatsapp-greenapi.greenapi",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        224
+      ],
+      "id": "ce26083c-8fcd-4bd3-be19-43e8610c9502",
+      "name": "Send message",
+      "credentials": {
+        "greenApiAuthApi": {
+          "id": "IEFNNbCkKVhfThoh",
+          "name": "Green-API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "facebook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        944
+      ],
+      "id": "1bd6fe79-7312-44cb-a100-fac104f668c6",
+      "name": "Webhook",
+      "webhookId": "65a64d08-6ad4-44f1-914f-6f57641f63e8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v26.0/me/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "EAAd0JUKhYlUBSjbEFeLGcljwHnEXoowfljhiuda69DZBt3rMkde7ZAYk841nrur3g6ZCHBMxx3NBhSrfCHAM8tUKmAQhokTg2TjIaj7ZCSmMZCk8nJUuSjDRazX0cAIdMNjqAkFGZBxz0OziBlsXlzLc0OhZCRjtYtW7rD4TG5jbV6nRorvhB8ZA0DArZBcKAV94thACMcLwGd2XOLebobSmZBAqhA9wZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  JSON.stringify({\n    recipient: {\n      id: $json.user_id\n    },\n    message: {\n      text: $json.reply_text\n    }\n  })\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2608,
+        480
+      ],
+      "id": "68aa1da7-2c29-416e-a217-c698370e07cf",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "chatId": "8834960864",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3040,
+        1008
+      ],
+      "id": "58391dc8-71d5-40f2-b96a-d577ca9d2cc0",
+      "name": "Send a text message1",
+      "webhookId": "4e34476c-4c87-4c8f-bccc-b6d30a63044f",
+      "credentials": {
+        "telegramApi": {
+          "id": "LrZE98UlfjjVL5nN",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        1072
+      ],
+      "id": "815b993f-1b50-4c2b-93c2-b6a659ad1cdc",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "0vwgRUN9DYItIrgs",
+          "name": "Groq account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Normalize Incoming Message": {
+      "main": [
+        [
+          {
+            "node": "Read Rooms Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Event Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Restaurant Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read FAQ Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Rooms Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge Rooms Restaurant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Restaurant Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge Rooms Restaurant",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Read Event Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge Event FAQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read FAQ Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge Event FAQ",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Rooms Restaurant": {
+      "main": [
+        [
+          {
+            "node": "Merge All Resort Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Event FAQ": {
+      "main": [
+        [
+          {
+            "node": "Merge All Resort Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge All Resort Data": {
+      "main": [
+        [
+          {
+            "node": "Build Resort AI Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Resort AI Context": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI JSON": {
+      "main": [
+        [
+          {
+            "node": "Prepare Channel Reply",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Route Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Intent": {
+      "main": [
+        [
+          {
+            "node": "Append Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append Order - Payment Pending",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append Booking - Payment Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Owner Notification": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Channel Reply": {
+      "main": [
+        [
+          {
+            "node": "Route Reply To Source Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Reply To Source Channel": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Incoming Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse AI JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GREENAPI Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Incoming Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Incoming Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Append Order - Payment Pending": {
+      "main": [
+        [
+          {
+            "node": "Prepare Owner Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Booking - Payment Pending": {
+      "main": [
+        [
+          {
+            "node": "Prepare Owner Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "dd1a18f2-8575-42d8-b331-76bb959a4a22",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "60f3b17103980db350fa7a28ed4af497d671a28c3d61e880ca96a104492eec0a"
+  },
+  "nodeGroups": [],
+  "id": "lWOXnveOuodyfA9c",
+  "tags": []
+}

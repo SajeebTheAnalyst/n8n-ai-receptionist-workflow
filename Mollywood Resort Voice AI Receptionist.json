@@ -1,0 +1,1393 @@
+{
+  "name": "Mollywood Resort Voice AI Receptionist",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vapi-master-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "2ae82732-9af5-4d5c-b96a-7b9c442236f0",
+      "name": "Master Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        352
+      ],
+      "webhookId": "mollywood-master-webhook-001"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.message.toolCalls[0].function.name }}",
+                    "rightValue": "get_resort_info",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "get_resort_info"
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.message.toolCalls[0].function.name }}",
+                    "rightValue": "check_event_availability",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "check_event_availability"
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.message.toolCalls[0].function.name }}",
+                    "rightValue": "save_inquiry",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "save_inquiry"
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.message.toolCalls[0].function.name }}",
+                    "rightValue": "create_order",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "create_order"
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.message.toolCalls[0].function.name }}",
+                    "rightValue": "create_booking",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "create_booking"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5b64ae25-e7aa-495e-84e0-e83d71e5f89d",
+      "name": "Router Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -368,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Restaurants",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "431ba6fa-e64b-4c54-bce9-f7609f3191dd",
+      "name": "Read Restaurants",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -128,
+        0
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2107160713,
+          "mode": "list",
+          "cachedResultName": "Rooms",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=2107160713"
+        },
+        "options": {}
+      },
+      "id": "fcc43218-95c9-4a7d-9f40-c0e52fec8fb2",
+      "name": "Read Rooms",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        112,
+        0
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1296818538,
+          "mode": "list",
+          "cachedResultName": "Events",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=1296818538"
+        },
+        "options": {}
+      },
+      "id": "abffbb5b-5c01-4ee8-9643-806d7993d14a",
+      "name": "Read Events",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        352,
+        0
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 199051218,
+          "mode": "list",
+          "cachedResultName": "FAQ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=199051218"
+        },
+        "options": {}
+      },
+      "id": "c63e3672-0b07-4f76-822c-deb495db3011",
+      "name": "Read FAQ",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        592,
+        0
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCallId = $('Master Webhook').first().json.body?.message?.toolCalls?.[0]?.id ?? 'unknown';\n\nconst restaurantRows = $('Read Restaurants').all();\nconst roomRows = $('Read Rooms').all();\nconst eventRows = $('Read Events').all();\nconst faqRows = $('Read FAQ').all();\n\nconst menuText = restaurantRows.map(i => {\n  const r = i.json;\n  return `- ${r['Item Name']} [${r['Category']}] BDT ${r['Price']}: ${r['Description']}`;\n}).join('\\n');\n\nconst roomText = roomRows.map(i => {\n  return Object.entries(i.json).map(([k,v]) => `${k}: ${v}`).join(' | ');\n}).join('\\n');\n\nconst eventText = eventRows.map(i => {\n  return Object.entries(i.json).map(([k,v]) => `${k}: ${v}`).join(' | ');\n}).join('\\n');\n\nconst faqText = faqRows.map(i => {\n  return Object.entries(i.json).map(([k,v]) => `${k}: ${v}`).join(' | ');\n}).join('\\n');\n\nconst fullContext = `=== RESTAURANT MENU ===\\n${menuText}\\n\\n=== ROOMS & COTTAGES ===\\n${roomText}\\n\\n=== EVENTS ===\\n${eventText}\\n\\n=== FAQ ===\\n${faqText}`;\n\nreturn [{ json: { results: [{ toolCallId, result: fullContext }] } }];"
+      },
+      "id": "6badf29b-cf72-4060-9dca-bf97476f9032",
+      "name": "Aggregate Resort Info",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "4489aa98-ad74-4641-bd4c-16eb8c12acb4",
+      "name": "Respond Info",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 39958687,
+          "mode": "list",
+          "cachedResultName": "Event Planning",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=39958687"
+        },
+        "options": {}
+      },
+      "id": "adb22420-c99d-4c13-9621-d70a9f7dfe2c",
+      "name": "Read Event Planning",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -128,
+        208
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookJson = $('Master Webhook').first().json;\nconst toolCallId = webhookJson.body?.message?.toolCalls?.[0]?.id ?? 'unknown';\nconst rawArgs = webhookJson.body?.message?.toolCalls?.[0]?.function?.arguments ?? '{}';\nlet args = {};\ntry { args = typeof rawArgs === 'string' ? JSON.parse(rawArgs) : rawArgs; } catch(e) { args = {}; }\nconst requestedDate = (args.requested_date ?? '').toString().trim();\n\nconst rows = $('Read Event Planning').all().map(i => i.json);\nlet available = true;\nfor (const row of rows) {\n  const rowDate = (row['Date'] ?? row['Event Date'] ?? '').toString().trim();\n  const rowStatus = (row['Status'] ?? '').toString().toLowerCase().trim();\n  if (rowDate === requestedDate && rowStatus === 'ongoing') { available = false; break; }\n}\n\nconst message = available\n  ? `Great news! ${requestedDate} is available for your event at Mollywood Resort. Please share more details to confirm the booking.`\n  : `Sorry, ${requestedDate} is already booked. Please suggest an alternative date.`;\n\nreturn [{ json: { results: [{ toolCallId, result: JSON.stringify({ available, requested_date: requestedDate, message }) }] } }];"
+      },
+      "id": "a26948ab-7ead-47f1-8008-eaf3d15cf3c4",
+      "name": "Check Event Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "f23c2c03-3de0-408b-9a9f-5486aa792d35",
+      "name": "Respond Event",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        352,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCall = $('Master Webhook').first().json.body?.message?.toolCalls?.[0];\nconst toolCallId = toolCall?.id ?? 'unknown';\nconst rawArgs = toolCall?.function?.arguments ?? '{}';\nlet args = {};\ntry { args = typeof rawArgs === 'string' ? JSON.parse(rawArgs) : rawArgs; } catch(e) { args = {}; }\n\nreturn [{ json: {\n  toolCallId,\n  customer_name: args.customer_name ?? '',\n  phone: args.phone ?? '',\n  query_details: args.query_details ?? ''\n}}];"
+      },
+      "id": "44d1e7ef-77ae-48e7-b5ad-47054f859b54",
+      "name": "Parse Inquiry Args",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 608011264,
+          "mode": "list",
+          "cachedResultName": "Inquery",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=608011264"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer Name": "={{ $json.customer_name }}",
+            "Timestamp": "={{ new Date().toLocaleString('en-BD', { timeZone: 'Asia/Dhaka' }) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer Phone",
+              "displayName": "Customer Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Input",
+              "displayName": "Customer Input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI Response",
+              "displayName": "AI Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Inquiry Type",
+              "displayName": "Inquiry Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "intent",
+              "displayName": "intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source_channel",
+              "displayName": "source_channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_reply",
+              "displayName": "customer_reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "extracted_data",
+              "displayName": "extracted_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reply_text",
+              "displayName": "reply_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Receipt ID",
+              "displayName": "Receipt ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Items",
+              "displayName": "Items",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "details",
+              "displayName": "details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "receipt_id",
+              "displayName": "receipt_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_phone",
+              "displayName": "customer_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "items",
+              "displayName": "items",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1c2534fe-da8f-47da-81a4-1c24b6f1edf3",
+      "name": "Save Inquiry",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        112,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCallId = $('Parse Inquiry Args').first().json.toolCallId ?? 'unknown';\nreturn [{ json: { results: [{ toolCallId, result: JSON.stringify({ status: 'success', message: 'Your inquiry has been recorded. Our team will contact you shortly.' }) }] } }];"
+      },
+      "id": "3dab0de3-6ac2-4c2a-95e2-7c322337c1c6",
+      "name": "Build Inquiry Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "3a6193a5-5617-4e17-9438-c19041971934",
+      "name": "Respond Inquiry",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCall = $('Master Webhook').first().json.body?.message?.toolCalls?.[0];\nconst toolCallId = toolCall?.id ?? 'unknown';\nconst rawArgs = toolCall?.function?.arguments ?? '{}';\nlet args = {};\ntry { args = typeof rawArgs === 'string' ? JSON.parse(rawArgs) : rawArgs; } catch(e) { args = {}; }\n\nreturn [{ json: {\n  toolCallId,\n  customer_name: args.customer_name ?? '',\n  email: args.email ?? '',\n  phone: args.phone ?? '',\n  food_items: args.food_items ?? '',\n  serving_date: args.serving_date ?? '',\n  serving_time: args.serving_time ?? '',\n  guest_count: args.guest_count ?? ''\n}}];"
+      },
+      "id": "fa8be293-241d-48f5-bf2d-78112dde4468",
+      "name": "Parse Order Args",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 553574685,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=553574685"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer Name": "={{ $json.customer_name }}",
+            "Timestamp": "={{ new Date().toLocaleString('en-BD', { timeZone: 'Asia/Dhaka' }) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Receipt ID",
+              "displayName": "Receipt ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Phone",
+              "displayName": "Customer Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Items",
+              "displayName": "Items",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "0c072c5c-499a-4bda-9e37-f7144f0d8f51",
+      "name": "Save Order",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        112,
+        608
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_YOUR_TELEGRAM_CHAT_ID",
+        "text": "=🍔 NEW FOOD ORDER ALERT\n\n👤 Name: {{ $('Parse Order Args').first().json.customer_name }}\n📞 Phone: {{ $('Parse Order Args').first().json.phone }}\n📧 Email: {{ $('Parse Order Args').first().json.email }}\n🍽️ Items: {{ $('Parse Order Args').first().json.food_items }}\n📅 Serving Date: {{ $('Parse Order Args').first().json.serving_date }}\n⏰ Serving Time: {{ $('Parse Order Args').first().json.serving_time }}\n👥 Guests: {{ $('Parse Order Args').first().json.guest_count }}\n🕐 Recorded: {{ new Date().toLocaleString('en-BD', { timeZone: 'Asia/Dhaka' }) }}",
+        "additionalFields": {}
+      },
+      "id": "a43b3f42-f4c7-44a2-ac00-cc598df5f079",
+      "name": "Telegram Order Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        608
+      ],
+      "webhookId": "252aebb1-ac91-4eab-8ab7-2db58769d311",
+      "credentials": {
+        "telegramApi": {
+          "id": "BznYAqUr2dcWIIUj",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCallId = $('Parse Order Args').first().json.toolCallId ?? 'unknown';\nreturn [{ json: { results: [{ toolCallId, result: JSON.stringify({ status: 'success', message: 'Your food order has been confirmed! Our team will contact you to confirm the details.' }) }] } }];"
+      },
+      "id": "8f8b4369-055d-41fe-b16c-3d5aa1b88fbe",
+      "name": "Build Order Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "8e4f3e52-4836-4f16-99df-e627cbf4e08a",
+      "name": "Respond Order",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCall = $('Master Webhook').first().json.body?.message?.toolCalls?.[0];\nconst toolCallId = toolCall?.id ?? 'unknown';\nconst rawArgs = toolCall?.function?.arguments ?? '{}';\nlet args = {};\ntry { args = typeof rawArgs === 'string' ? JSON.parse(rawArgs) : rawArgs; } catch(e) { args = {}; }\n\nreturn [{ json: {\n  toolCallId,\n  customer_name: args.customer_name ?? '',\n  email: args.email ?? '',\n  phone: args.phone ?? '',\n  check_in: args.check_in ?? '',\n  check_out: args.check_out ?? '',\n  cottage_type: args.cottage_type ?? '',\n  event_type: args.event_type ?? '',\n  guest_count: args.guest_count ?? ''\n}}];"
+      },
+      "id": "ee36b8ea-0e8a-443a-95e6-6fb30c00a83e",
+      "name": "Parse Booking Args",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c",
+          "mode": "list",
+          "cachedResultName": "RESORT AI RECEPTIONIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1691133835,
+          "mode": "list",
+          "cachedResultName": "Booking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fv2wa4TDdsL8zMsXDA09hdJxrOlIgPspTUh0o4Pkw9c/edit#gid=1691133835"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer Name": "={{ $json.customer_name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Booking ID",
+              "displayName": "Booking ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Phone",
+              "displayName": "Customer Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Booking Type",
+              "displayName": "Booking Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Item Name",
+              "displayName": "Item Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Check-in Date",
+              "displayName": "Check-in Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Check-out Date",
+              "displayName": "Check-out Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Amount",
+              "displayName": "Total Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Booking Status",
+              "displayName": "Booking Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Created Timestamp",
+              "displayName": "Created Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f4ca87f6-bf00-4caa-a66e-0cb87dded429",
+      "name": "Save Booking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        112,
+        800
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OzAAowgNQ9mNFKuI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_YOUR_TELEGRAM_CHAT_ID",
+        "text": "=🏨 NEW RESORT BOOKING ALERT\n\n👤 Name: {{ $('Parse Booking Args').first().json.customer_name }}\n📞 Phone: {{ $('Parse Booking Args').first().json.phone }}\n📧 Email: {{ $('Parse Booking Args').first().json.email }}\n🏡 Cottage/Room: {{ $('Parse Booking Args').first().json.cottage_type }}\n🎉 Event Type: {{ $('Parse Booking Args').first().json.event_type }}\n📅 Check-in: {{ $('Parse Booking Args').first().json.check_in }}\n📅 Check-out: {{ $('Parse Booking Args').first().json.check_out }}\n👥 Guests: {{ $('Parse Booking Args').first().json.guest_count }}\n🕐 Recorded: {{ new Date().toLocaleString('en-BD', { timeZone: 'Asia/Dhaka' }) }}",
+        "additionalFields": {}
+      },
+      "id": "5e9ce2d4-9644-4010-bdf1-5835ea267b43",
+      "name": "Telegram Booking Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        800
+      ],
+      "webhookId": "29fb97a6-17ad-455b-b739-aa9a45c04a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "BznYAqUr2dcWIIUj",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCallId = $('Parse Booking Args').first().json.toolCallId ?? 'unknown';\nreturn [{ json: { results: [{ toolCallId, result: JSON.stringify({ status: 'success', message: 'Your booking at Mollywood Resort is confirmed! Our team will contact you shortly to finalize all details.' }) }] } }];"
+      },
+      "id": "12d8af70-85f2-4a76-a6a8-c4cd0a0fbeb2",
+      "name": "Build Booking Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "0b38aa53-85ef-4d9a-850e-0e2b7814293c",
+      "name": "Respond Booking",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        800
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Master Webhook": {
+      "main": [
+        [
+          {
+            "node": "Router Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router Switch": {
+      "main": [
+        [
+          {
+            "node": "Read Restaurants",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read Event Planning",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Inquiry Args",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Order Args",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Booking Args",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Restaurants": {
+      "main": [
+        [
+          {
+            "node": "Read Rooms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Rooms": {
+      "main": [
+        [
+          {
+            "node": "Read Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Events": {
+      "main": [
+        [
+          {
+            "node": "Read FAQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read FAQ": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Resort Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Resort Info": {
+      "main": [
+        [
+          {
+            "node": "Respond Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Event Planning": {
+      "main": [
+        [
+          {
+            "node": "Check Event Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Event Logic": {
+      "main": [
+        [
+          {
+            "node": "Respond Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Inquiry Args": {
+      "main": [
+        [
+          {
+            "node": "Save Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Build Inquiry Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Inquiry Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Order Args": {
+      "main": [
+        [
+          {
+            "node": "Save Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Order": {
+      "main": [
+        [
+          {
+            "node": "Telegram Order Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Order Alert": {
+      "main": [
+        [
+          {
+            "node": "Build Order Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Order Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Booking Args": {
+      "main": [
+        [
+          {
+            "node": "Save Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Booking": {
+      "main": [
+        [
+          {
+            "node": "Telegram Booking Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Booking Alert": {
+      "main": [
+        [
+          {
+            "node": "Build Booking Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Booking Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "186f0c7f-23da-459f-9de1-0e5777566879",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "60f3b17103980db350fa7a28ed4af497d671a28c3d61e880ca96a104492eec0a"
+  },
+  "nodeGroups": [],
+  "id": "q6R6u808oSV1YJ7E",
+  "tags": []
+}
